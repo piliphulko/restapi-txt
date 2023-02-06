@@ -1,9 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"log"
+
+	"github.com/piliphulko/practiceGo/pkg/rememberlog"
 )
 
 func main() {
-	fmt.Println("test")
+	file, err := rememberlog.CRWfile("new.log")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
