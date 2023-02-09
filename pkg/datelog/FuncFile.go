@@ -2,93 +2,89 @@ package datelog
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"log"
 	"os"
 )
 
-func ReadTypeFromAFile(name string, typeDate int) ([]AllTypes, error) {
-	file, err := os.OpenFile(name, os.O_CREATE|os.O_RDONLY|os.O_APPEND, os.FileMode(0755))
+func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if file.Close() != nil {
-			log.Fatal(err)
+	scanner := bufio.NewScanner(file)
+	slice := make([]AllTypes, 0)
+	for scanner.Scan() {
+		sliceType, err := DetailTypes[typeData].ScanType(scanner.Text())
+		if err != nil {
+			return nil, err
 		}
-	}()
-	var (
-		scanner    = bufio.NewScanner(file)
-		sliceTyper = make([]AllTypes, 0)
-	)
-	switch typeDate {
-	case TypeUser:
-		var (
-			id   int
-			name string
-		)
-		for scanner.Scan() {
-			if _, err := fmt.Sscanf(scanner.Text(), sampleTypes[TypeUser], &id, &name); err != nil {
-				return nil, err
-			}
-			sliceTyper = append(sliceTyper, User{id, name})
-		}
-	default:
-		return nil, errors.New("error scan type - non")
+		slice = append(slice, sliceType)
 	}
 	if scanner.Err() != nil {
 		return nil, err
 	}
-	return sliceTyper, err
+	if file.Close() != nil {
+		return nil, err
+	}
+	return slice, nil
 }
 
-func FileAddDeleteDateType(fileName string, typeUser int) (*os.File, *os.File, func(), error) {
+func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 	var (
-		returnFunc func()
-		fatalErr   = func(err error) {
+		fm           = os.FileMode(0755)
+		settingsFile = os.O_CREATE | os.O_RDWR | os.O_APPEND
+		logFataIF    = func(err error) {
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	)
-	switch typeUser {
-	case TypeUser:
-		//fAdd, err := os.CreateTemp("", "tUserAdd_*.log")
-		//fDelete, err = os.CreateTemp("", "tUserDelete_*.log")
-		fAdd, err := os.OpenFile("tUserAdd.log", os.O_CREATE|os.O_RDWR|os.O_APPEND, os.FileMode(0755))
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		fDelete, err := os.OpenFile("tUserDelete.log", os.O_CREATE|os.O_RDWR|os.O_APPEND, os.FileMode(0755))
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		//if os.WriteFile("locationUserFiles.txt",
-		//	[]byte(fmt.Sprintf("User type\nAdd: %s\nDel: %s", fAdd.Name(), fDelete.Name())), os.FileMode(0755)) != nil {
-		//	log.Fatal(err)
-		//}
-		returnFunc = func() {
-			fatalErr(fAdd.Close())
-			fatalErr(fDelete.Close())
-			usersMain, err := ReadTypeFromAFile(fileName, TypeUser)
-			fatalErr(err)
-			usersNew, err := ReadTypeFromAFile(fAdd.Name(), TypeUser)
-			fatalErr(err)
-			usersDelete, err := ReadTypeFromAFile(fDelete.Name(), TypeUser)
-			fatalErr(err)
-			os.Remove(fileName)
-			file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0755))
-			fatalErr(err)
-			for _, v := range cleanAddDel(usersMain, usersNew, usersDelete) {
-				fmt.Fprintln(file, v)
-			}
-			fatalErr(file.Close())
-			os.Remove(fAdd.Name())
-			os.Remove(fDelete.Name())
-		}
-		return fAdd, fDelete, returnFunc, nil
-	default:
-		return nil, nil, nil, errors.New("no such type")
+
+	err := os.Mkdir("data", fm)
+	if err != nil && !os.IsExist(err) {
+		return nil, nil, nil, err
 	}
+	err = os.Mkdir(DetailTypes[typeData].DirectoryFiles, fm)
+	if err != nil && !os.IsExist(err) {
+		return nil, nil, nil, err
+	}
+	fAdd, err := os.OpenFile(DetailTypes[typeData].LocationAddFile, settingsFile, fm)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	fDel, err := os.OpenFile(DetailTypes[typeData].LocationDelFile, settingsFile, fm)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	closeData := func() {
+		logFataIF(fAdd.Close())
+		logFataIF(fDel.Close())
+		WarehousingData(typeData)
+	}
+	return fAdd, fDel, closeData, err
+}
+
+func WarehousingData(typeData int) {
+	var logFataIF = func(err error) {
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
+	logFataIF(err)
+	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
+	logFataIF(err)
+	typesDel, err := GetDataTypesFromFile(DetailTypes[typeData].LocationDelFile, typeData)
+	logFataIF(err)
+	logFataIF(os.Rename(DetailTypes[typeData].LocationMainFile, DetailTypes[typeData].LocationStockMainFile))
+	fMain, err := os.OpenFile(DetailTypes[typeData].LocationMainFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0755))
+	logFataIF(err)
+	for _, v := range cleanAddDel(typesMain, typesAdd, typesDel) {
+		fmt.Fprintln(fMain, v)
+	}
+	logFataIF(fMain.Close())
+	os.Remove(DetailTypes[typeData].LocationAddFile)
+	os.Remove(DetailTypes[typeData].LocationDelFile)
+	os.Remove(DetailTypes[typeData].LocationStockMainFile)
 }

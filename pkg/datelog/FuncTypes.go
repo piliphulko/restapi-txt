@@ -2,7 +2,6 @@ package datelog
 
 import (
 	"fmt"
-	"io"
 )
 
 func Unique(slice []AllTypes) []AllTypes {
@@ -48,12 +47,4 @@ func cleanAddDel(types, typesAdd, typesDel []AllTypes) []AllTypes {
 		}
 	}
 	return returnTypes
-}
-
-func WriteType(fileName io.Writer, slice []AllTypes, vType AllTypes) ([]AllTypes, error) {
-	if _, err := fmt.Fprintln(fileName, vType); err != nil {
-		return slice, err
-	}
-	slice = append(slice, vType)
-	return slice, nil
 }

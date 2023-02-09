@@ -2,9 +2,17 @@ package datelog
 
 import "fmt"
 
+type AllTypes interface {
+	String() string
+}
+
 type User struct {
 	Id   int
 	Name string
+}
+
+func (u User) String() string {
+	return fmt.Sprintf(DetailTypes[TypeUser].SampleFMT, u.Id, u.Name)
 }
 
 const (
@@ -12,14 +20,33 @@ const (
 	TypeUser
 )
 
-var sampleTypes = map[int]string{
-	TypeUser: "Id: %d Name: %s",
+type typeDetail struct {
+	SampleFMT             string
+	DirectoryFiles        string
+	LocationMainFile      string
+	LocationAddFile       string
+	LocationDelFile       string
+	LocationStockMainFile string
+	ScanType              func(string) (AllTypes, error)
 }
 
-func (u User) String() string {
-	return fmt.Sprintf(sampleTypes[TypeUser], u.Id, u.Name)
-}
-
-type AllTypes interface {
-	String() string
+var DetailTypes = map[int]typeDetail{
+	TypeUser: {
+		SampleFMT:             "Id: %d Name: %s",
+		DirectoryFiles:        "data/User",
+		LocationMainFile:      "data/User/mainUser.log",
+		LocationAddFile:       "data/User/addUser.log",
+		LocationDelFile:       "data/User/delUser.log",
+		LocationStockMainFile: "data/User/stockMainUser.log",
+		ScanType: func(s string) (AllTypes, error) {
+			var (
+				id   int
+				name string
+			)
+			if _, err := fmt.Sscanf(s, "Id: %d Name: %s", &id, &name); err != nil {
+				return nil, err
+			}
+			return User{id, name}, nil
+		},
+	},
 }

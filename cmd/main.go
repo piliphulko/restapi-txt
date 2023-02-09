@@ -8,23 +8,18 @@ import (
 )
 
 func main() {
-	var (
-		mainFileUser = "file.log"
-		//userAdd = []datelog.User{}
-		//userDel = []datelog.User{}
-		fileUserAdd, fileUserDel, endUserDate, err = datelog.FileAddDeleteDateType(mainFileUser, datelog.TypeUser)
-	)
-	if err != nil {
-		log.Fatal(err)
+	var logFatalIF = func(err error) {
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	defer endUserDate()
-
-	//userAdd = append(userAdd, datelog.User{5, "lip"})
-	//userDel = append(userDel, datelog.User{5, "lip"})
-	fmt.Fprintln(fileUserAdd, datelog.User{5, "lip"})
-	fmt.Fprintln(fileUserDel, datelog.User{5, "lip"})
-	fmt.Fprintln(fileUserAdd, datelog.User{5, "lip"})
-
-	//fileUserAdd.Write([]byte("do you work?"))
-	//time.Sleep(1 * time.Minute)
+	userAdd, userDel, userClose, err := datelog.DataWarehouseDeployment(datelog.TypeUser)
+	logFatalIF(err)
+	defer userClose()
+	_, err = fmt.Fprintln(userAdd, datelog.User{Id: 2, Name: "pip"})
+	logFatalIF(err)
+	_, err = fmt.Fprintln(userDel, datelog.User{Id: 2, Name: "pip"})
+	logFatalIF(err)
+	_, err = fmt.Fprintln(userAdd, datelog.User{Id: 2, Name: "pip"})
+	logFatalIF(err)
 }
