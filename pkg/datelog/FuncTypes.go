@@ -1,9 +1,5 @@
 package datelog
 
-import (
-	"fmt"
-)
-
 func Unique(slice []AllTypes) []AllTypes {
 	var n int
 	for n1 := 0; n1 < len(slice); n1++ {
@@ -20,19 +16,23 @@ finish:
 	return Unique(append(slice[:n], slice[n+1:]...))
 }
 
-func cleanAddDel(types, typesAdd, typesDel []AllTypes) []AllTypes {
+func cleanAddDel(typesMain, typesAdd, typesDel []AllTypes) []AllTypes {
 	type allTypesCOUNT struct {
 		AllTypes
 		count int
 	}
-	typesCOUNT := []allTypesCOUNT{}
-	returnTypes := []AllTypes{}
-	for _, v := range Unique(append(types, typesAdd...)) {
-		typesCOUNT = append(typesCOUNT, allTypesCOUNT{v, 0})
-	}
-	for _, v := range typesCOUNT {
-		fmt.Println(v, v.count)
-		for _, vA := range append(types, typesAdd...) {
+	var (
+		returnTypes = []AllTypes{}
+		typesCOUNT  = make(chan allTypesCOUNT)
+	)
+	go func() {
+		for _, v := range Unique(append(typesMain, typesAdd...)) {
+			typesCOUNT <- allTypesCOUNT{v, 0}
+		}
+		close(typesCOUNT)
+	}()
+	for v := range typesCOUNT {
+		for _, vA := range append(typesMain, typesAdd...) {
 			if v.AllTypes == vA {
 				v.count += 1
 			}
