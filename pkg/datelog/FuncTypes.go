@@ -15,6 +15,17 @@ func Unique(slice []AllTypes) []AllTypes {
 finish:
 	return Unique(append(slice[:n], slice[n+1:]...))
 }
+func UniqueNew(slice []AllTypes) []AllTypes {
+	mapSlice := map[AllTypes]bool{}
+	returnSlice := []AllTypes{}
+	for _, v := range slice {
+		mapSlice[v] = true
+	}
+	for v := range mapSlice {
+		returnSlice = append(returnSlice, v)
+	}
+	return returnSlice
+}
 
 func cleanAddDel(typesMain, typesAdd, typesDel []AllTypes) []AllTypes {
 	type allTypesCOUNT struct {
