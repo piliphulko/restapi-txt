@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
@@ -40,13 +41,7 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 			}
 		}
 	)
-
-	err := os.Mkdir("data", fm)
-	if err != nil && !os.IsExist(err) {
-		return nil, nil, nil, err
-	}
-	err = os.Mkdir(DetailTypes[typeData].DirectoryFiles, fm)
-	if err != nil && !os.IsExist(err) {
+	if err := deploymentMkdir(DetailTypes, typeData); err != nil {
 		return nil, nil, nil, err
 	}
 	fAdd, err := os.OpenFile(DetailTypes[typeData].LocationAddFile, settingsFile, fm)
@@ -87,4 +82,24 @@ func WarehousingData(typeData int) {
 	os.Remove(DetailTypes[typeData].LocationAddFile)
 	os.Remove(DetailTypes[typeData].LocationDelFile)
 	os.Remove(DetailTypes[typeData].LocationStockMainFile)
+}
+
+func deploymentMkdir(m map[int]typeDetail, typeData int) error {
+	mkdirAll := func(path string) error {
+		if err := os.MkdirAll(path, 0750); err != nil && !os.IsExist(err) {
+			return err
+		}
+		return nil
+	}
+	var slice []string
+	slice = append(slice, filepath.Dir(m[typeData].LocationMainFile),
+		filepath.Dir(m[typeData].LocationAddFile),
+		filepath.Dir(m[typeData].LocationDelFile),
+		filepath.Dir(m[typeData].LocationStockMainFile))
+	for _, v := range slice {
+		if err := mkdirAll(v); err != nil {
+			return err
+		}
+	}
+	return nil
 }

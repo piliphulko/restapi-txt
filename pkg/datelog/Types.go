@@ -22,7 +22,6 @@ const (
 
 type typeDetail struct {
 	SampleFMT             string
-	DirectoryFiles        string
 	LocationMainFile      string
 	LocationAddFile       string
 	LocationDelFile       string
@@ -33,7 +32,6 @@ type typeDetail struct {
 var DetailTypes = map[int]typeDetail{
 	TypeUser: {
 		SampleFMT:             "Id: %d Name: %s",
-		DirectoryFiles:        "data/User",
 		LocationMainFile:      "data/User/mainUser.log",
 		LocationAddFile:       "data/User/addUser.log",
 		LocationDelFile:       "data/User/delUser.log",
