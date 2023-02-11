@@ -1,6 +1,6 @@
 package datelog
 
-func Unique(slice []AllTypes) []AllTypes {
+func UniqueOld(slice []AllTypes) []AllTypes {
 	var n int
 	for n1 := 0; n1 < len(slice); n1++ {
 		for n2 := len(slice) - 1; n2 > 0; n2-- {
@@ -13,9 +13,9 @@ func Unique(slice []AllTypes) []AllTypes {
 	}
 	return slice
 finish:
-	return Unique(append(slice[:n], slice[n+1:]...))
+	return UniqueOld(append(slice[:n], slice[n+1:]...))
 }
-func UniqueNew(slice []AllTypes) []AllTypes {
+func Unique(slice []AllTypes) []AllTypes {
 	mapSlice := map[AllTypes]bool{}
 	returnSlice := []AllTypes{}
 	for _, v := range slice {

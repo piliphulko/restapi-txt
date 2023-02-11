@@ -1,8 +1,10 @@
 package datelog
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 )
 
 func changeToTestPath(m map[int]typeDetail, typeData int, newDir string) {
@@ -18,4 +20,12 @@ func changeToTestPath(m map[int]typeDetail, typeData int, newDir string) {
 	getStruct.LocationDelFile = change(getStruct.LocationDelFile, newDir)
 	getStruct.LocationStockMainFile = change(getStruct.LocationStockMainFile, newDir)
 	m[typeData] = getStruct
+}
+
+func MainTest(m *testing.M) {
+	locationTest := "testdata"
+	changeToTestPath(DetailTypes, TypeUser, locationTest)
+	mRun := m.Run()
+	os.RemoveAll(locationTest)
+	os.Exit(mRun)
 }

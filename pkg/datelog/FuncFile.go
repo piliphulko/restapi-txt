@@ -2,11 +2,18 @@ package datelog
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 )
+
+func logFataIF(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
@@ -35,11 +42,6 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 	var (
 		fm           = os.FileMode(0755)
 		settingsFile = os.O_CREATE | os.O_RDWR | os.O_APPEND
-		logFataIF    = func(err error) {
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
 	)
 	if err := deploymentMkdir(DetailTypes, typeData); err != nil {
 		return nil, nil, nil, err
@@ -61,11 +63,6 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 }
 
 func WarehousingData(typeData int) {
-	var logFataIF = func(err error) {
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
 	logFataIF(err)
 	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
@@ -100,6 +97,33 @@ func deploymentMkdir(m map[int]typeDetail, typeData int) error {
 		if err := mkdirAll(v); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func CheckEndWarehousingData(typeData int) error {
+	_, err0 := os.Stat(DetailTypes[typeData].LocationStockMainFile)
+	_, err1 := os.Stat(DetailTypes[typeData].LocationAddFile)
+	_, err2 := os.Stat(DetailTypes[typeData].LocationDelFile)
+	switch {
+	case (errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
+		fmt.Printf("did not happen: %s\n", DetailTypes[typeData].NameType)
+		WarehousingData(typeData)
+	case !(errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
+		fmt.Printf("there was an incorrect completion of writing to the main file: %s\n", DetailTypes[typeData].NameType)
+		if err := os.Remove(DetailTypes[typeData].LocationMainFile); err != nil {
+			return err
+		}
+		if err := os.Rename(DetailTypes[typeData].LocationStockMainFile, DetailTypes[typeData].LocationMainFile); err != nil {
+			return err
+		}
+		WarehousingData(typeData)
+	case (!(errors.Is(err1, os.ErrNotExist)) && (errors.Is(err2, os.ErrNotExist))) ||
+		((errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist))):
+		fmt.Printf("some file is missing (Add or Del): %s\n", DetailTypes[typeData].NameType)
+		return errors.New("error file Add or Del")
+	default:
+		return nil
 	}
 	return nil
 }

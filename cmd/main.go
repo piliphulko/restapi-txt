@@ -18,6 +18,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	logFatalIF(datelog.CheckEndWarehousingData(datelog.TypeUser))
 	userAdd, userDel, userClose, err := datelog.DataWarehouseDeployment(datelog.TypeUser)
 	logFatalIF(err)
 	defer userClose()
