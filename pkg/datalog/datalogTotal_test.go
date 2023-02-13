@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func changeToTestPath(m map[int]typeDetail, typeData int, newDir string) {
@@ -23,9 +25,12 @@ func changeToTestPath(m map[int]typeDetail, typeData int, newDir string) {
 }
 
 func MainTest(m *testing.M) {
-	locationTest := "testdata"
-	changeToTestPath(DetailTypes, TypeUser, locationTest)
+	locationTest := "datatest"
 	mRun := m.Run()
 	os.RemoveAll(locationTest)
 	os.Exit(mRun)
+}
+
+func Test_ToatalPackage(t *testing.T) {
+	assert.Nil(t, CheckEndWarehousingData(typeTest))
 }
