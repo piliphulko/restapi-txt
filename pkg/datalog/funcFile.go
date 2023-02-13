@@ -1,4 +1,4 @@
-package datelog
+package datalog
 
 import (
 	"bufio"
@@ -9,13 +9,14 @@ import (
 	"path/filepath"
 )
 
-func logFataIF(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 func errInfoType(err error, typeData int) error {
 	return fmt.Errorf("%w | type: %s", err, DetailTypes[typeData].NameType)
+}
+
+func logFataIF(err error, typeData int) {
+	if err != nil {
+		log.Fatal(fmt.Errorf("%w | type: %s", err, DetailTypes[typeData].NameType))
+	}
 }
 
 func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
@@ -58,8 +59,8 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 		return nil, nil, nil, errInfoType(err, typeData)
 	}
 	closeData := func() {
-		logFataIF(fAdd.Close())
-		logFataIF(fDel.Close())
+		logFataIF(fAdd.Close(), typeData)
+		logFataIF(fDel.Close(), typeData)
 		WarehousingData(typeData)
 	}
 	return fAdd, fDel, closeData, nil
@@ -67,18 +68,18 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 
 func WarehousingData(typeData int) {
 	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
-	logFataIF(err)
+	logFataIF(err, typeData)
 	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
-	logFataIF(err)
+	logFataIF(err, typeData)
 	typesDel, err := GetDataTypesFromFile(DetailTypes[typeData].LocationDelFile, typeData)
-	logFataIF(err)
-	logFataIF(os.Rename(DetailTypes[typeData].LocationMainFile, DetailTypes[typeData].LocationStockMainFile))
+	logFataIF(err, typeData)
+	logFataIF(os.Rename(DetailTypes[typeData].LocationMainFile, DetailTypes[typeData].LocationStockMainFile), typeData)
 	fMain, err := os.OpenFile(DetailTypes[typeData].LocationMainFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0755))
-	logFataIF(err)
+	logFataIF(err, typeData)
 	for _, v := range cleanAddDel(typesMain, typesAdd, typesDel) {
 		fmt.Fprintln(fMain, v)
 	}
-	logFataIF(fMain.Close())
+	logFataIF(fMain.Close(), typeData)
 	os.Remove(DetailTypes[typeData].LocationAddFile)
 	os.Remove(DetailTypes[typeData].LocationDelFile)
 	os.Remove(DetailTypes[typeData].LocationStockMainFile)

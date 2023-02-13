@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/piliphulko/practiceGo/pkg/datelog"
+	"github.com/piliphulko/practiceGo/pkg/datalog"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -18,8 +18,8 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	logFatalIF(datelog.CheckEndWarehousingData(datelog.TypeUser))
-	userAdd, userDel, userClose, err := datelog.DataWarehouseDeployment(datelog.TypeUser)
+	logFatalIF(datalog.CheckEndWarehousingData(datalog.TypeUser))
+	userAdd, userDel, userClose, err := datalog.DataWarehouseDeployment(datalog.TypeUser)
 	logFatalIF(err)
 	defer userClose()
 
@@ -31,7 +31,7 @@ func main() {
 		for i := 0; i != 4; i++ {
 			buf.WriteByte(letterBytes[rand.Intn(len(letterBytes))])
 		}
-		_, err = fmt.Fprintln(userAdd, datelog.User{Id: rand.Intn(10), Name: string(buf.Bytes())})
+		_, err = fmt.Fprintln(userAdd, datalog.User{Id: rand.Intn(10), Name: string(buf.Bytes())})
 		logFatalIF(err)
 	}
 	for n := 0; n != 10000; n++ {
@@ -39,7 +39,7 @@ func main() {
 		for i := 0; i != 4; i++ {
 			buf.WriteByte(letterBytes[rand.Intn(len(letterBytes))])
 		}
-		_, err = fmt.Fprintln(userDel, datelog.User{Id: rand.Intn(10), Name: string(buf.Bytes())})
+		_, err = fmt.Fprintln(userDel, datalog.User{Id: rand.Intn(10), Name: string(buf.Bytes())})
 		logFatalIF(err)
 	}
 }

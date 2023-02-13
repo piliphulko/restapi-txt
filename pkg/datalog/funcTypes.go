@@ -1,4 +1,4 @@
-package datelog
+package datalog
 
 func UniqueOld(slice []AllTypes) []AllTypes {
 	var n int

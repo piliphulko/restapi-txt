@@ -1,4 +1,4 @@
-package datelog
+package datalog
 
 import "fmt"
 
