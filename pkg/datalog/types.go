@@ -22,13 +22,15 @@ const (
 
 type typeDetail struct {
 	NameType              string
-	SampleFMT             string
+	SampleFMT             string // writer template
 	LocationMainFile      string
 	LocationAddFile       string
 	LocationDelFile       string
 	LocationStockMainFile string
-	ScanType              func(string) (AllTypes, error)
+	ScanType              func(string) (AllTypes, error) // reader template
 }
+
+// DetailTypes map where spelled out the main details of the implementation of types in the package
 
 var DetailTypes = map[int]typeDetail{
 	TypeUser: {

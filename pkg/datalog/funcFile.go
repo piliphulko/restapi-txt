@@ -19,6 +19,11 @@ func logFataIF(err error, typeData int) {
 	}
 }
 
+// GetDataFromFile takes two variables: file name and data type written to this file
+// returns a slice of the read data and an error
+//
+// If there is no file, then it is created. after reading the data, the file is closed inside the function
+
 func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
 	if err != nil {
@@ -42,6 +47,12 @@ func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	return slice, errInfoType(err, typeData)
 }
 
+// DataWarehouseDeployment takes a data type and returns:
+//  1. file to add data
+//  2. file to delete data
+//  3. the function that closes files and writes all added data to the main storage
+//  4. errors
+
 func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 	var (
 		fm           = os.FileMode(0755)
@@ -61,12 +72,14 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 	closeData := func() {
 		logFataIF(fAdd.Close(), typeData)
 		logFataIF(fDel.Close(), typeData)
-		WarehousingData(typeData)
+		warehousingData(typeData)
 	}
 	return fAdd, fDel, closeData, nil
 }
 
-func WarehousingData(typeData int) {
+// warehousingData a function that collects data from files removed and added to the main storage
+
+func warehousingData(typeData int) {
 	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
 	logFataIF(err, typeData)
 	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
@@ -84,6 +97,8 @@ func WarehousingData(typeData int) {
 	os.Remove(DetailTypes[typeData].LocationDelFile)
 	os.Remove(DetailTypes[typeData].LocationStockMainFile)
 }
+
+// deploymentMkdir creates the necessary directory for files
 
 func deploymentMkdir(m map[int]typeDetail, typeData int) error {
 	mkdirAll := func(path string) error {
@@ -105,6 +120,9 @@ func deploymentMkdir(m map[int]typeDetail, typeData int) error {
 	return nil
 }
 
+// CheckEndWarehousingData check the correct completion of data processing in the main storage
+// If data processing has not occurred and it can be completed, then the function performs processing
+
 func CheckEndWarehousingData(typeData int) error {
 	_, err0 := os.Stat(DetailTypes[typeData].LocationStockMainFile)
 	_, err1 := os.Stat(DetailTypes[typeData].LocationAddFile)
@@ -112,7 +130,7 @@ func CheckEndWarehousingData(typeData int) error {
 	switch {
 	case (errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
 		fmt.Printf("did not happen: %s\n", DetailTypes[typeData].NameType)
-		WarehousingData(typeData)
+		warehousingData(typeData)
 	case !(errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
 		fmt.Printf("there was an incorrect completion of writing to the main file: %s\n", DetailTypes[typeData].NameType)
 		if err := os.Remove(DetailTypes[typeData].LocationMainFile); err != nil {
@@ -121,7 +139,7 @@ func CheckEndWarehousingData(typeData int) error {
 		if err := os.Rename(DetailTypes[typeData].LocationStockMainFile, DetailTypes[typeData].LocationMainFile); err != nil {
 			return errInfoType(err, typeData)
 		}
-		WarehousingData(typeData)
+		warehousingData(typeData)
 	case (!(errors.Is(err1, os.ErrNotExist)) && (errors.Is(err2, os.ErrNotExist))) ||
 		((errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist))):
 		fmt.Printf("some file is missing (Add or Del): %s\n", DetailTypes[typeData].NameType)

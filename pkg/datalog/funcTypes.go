@@ -15,6 +15,9 @@ func UniqueOld(slice []AllTypes) []AllTypes {
 finish:
 	return UniqueOld(append(slice[:n], slice[n+1:]...))
 }
+
+// Unique returns all unique values slice
+
 func Unique(slice []AllTypes) []AllTypes {
 	mapSlice := map[AllTypes]bool{}
 	returnSlice := []AllTypes{}
@@ -26,6 +29,12 @@ func Unique(slice []AllTypes) []AllTypes {
 	}
 	return returnSlice
 }
+
+// cleanAddDel takes three slices:
+//  1. main data
+//  2. added data
+//  3. delete data
+// the function implements adding and deleting data and returns a slice of all data that is created and not deleted
 
 func cleanAddDel(typesMain, typesAdd, typesDel []AllTypes) []AllTypes {
 	type allTypesCOUNT struct {
