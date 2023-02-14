@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	_ "github.com/google/go-cmp/cmp"
-	_ "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test_typeTestWriteAndRead(t *testing.T) {
+func Test_typeTestWriteAndReadTable(t *testing.T) {
 	var buf = bytes.Buffer{}
 	var data = []testType{
 		{1, "a", true, 1.15},
@@ -20,10 +19,9 @@ func Test_typeTestWriteAndRead(t *testing.T) {
 		t.Run("struct test", func(t *testing.T) {
 			buf.Reset()
 			fmt.Fprint(&buf, data[i])
-			_, err := DetailTypes[typeTest].ScanType(buf.String())
-			if err != nil {
-				t.Error(err)
-			}
+			dataGet, err := DetailTypes[typeTest].ScanType(buf.String())
+			assert.Nil(t, err)
+			assert.Equal(t, data[i], dataGet)
 		})
 	}
 }

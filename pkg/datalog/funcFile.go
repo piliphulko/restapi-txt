@@ -44,7 +44,7 @@ func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	if file.Close() != nil {
 		return nil, errInfoType(err, typeData)
 	}
-	return slice, errInfoType(err, typeData)
+	return slice, nil
 }
 
 // DataWarehouseDeployment takes a data type and returns:
