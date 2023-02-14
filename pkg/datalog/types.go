@@ -1,6 +1,9 @@
 package datalog
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type AllTypes interface {
 	String() string
@@ -80,4 +83,9 @@ var DetailTypes = map[int]typeDetail{
 			return User{id, name}, nil
 		},
 	},
+}
+
+type MutexAllTypes struct {
+	rwm sync.RWMutex
+	all []AllTypes
 }

@@ -10,13 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var locationTest = "datatest"
-
-func TestMain(m *testing.M) {
-	mR := m.Run()
-	os.RemoveAll(locationTest)
-	os.Exit(mR)
-}
 func Test_deploymentMkdir(t *testing.T) {
 	assert.Nil(t, deploymentMkdir(DetailTypes, typeTest))
 	assert.True(t, os.IsExist(os.Mkdir(filepath.Dir(DetailTypes[typeTest].LocationAddFile), 0750)))

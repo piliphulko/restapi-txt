@@ -1,5 +1,11 @@
 package datalog
 
+import (
+	"errors"
+	"fmt"
+	"os"
+)
+
 func UniqueOld(slice []AllTypes) []AllTypes {
 	var n int
 	for n1 := 0; n1 < len(slice); n1++ {
@@ -67,4 +73,69 @@ func cleanAddDel(typesMain, typesAdd, typesDel []AllTypes) []AllTypes {
 		}
 	}
 	return returnTypes
+}
+
+func GetMainSlice(typeData int) (*MutexAllTypes, error) {
+	slice, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
+	if err != nil {
+		return nil, err
+	}
+	var slicePlusMutex = MutexAllTypes{all: slice}
+	return &slicePlusMutex, nil
+}
+
+func (mat *MutexAllTypes) findValue(value AllTypes) bool {
+	for _, v := range mat.all {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
+
+func GetAddfunc(addFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error {
+	fn := func(addValue AllTypes) error {
+		if dataMain.findValue(addValue) {
+			return ErrValueExist
+		}
+		dataMain.rwm.Lock()
+		defer dataMain.rwm.Unlock()
+		if _, err := fmt.Fprintln(addFile, addValue); err != nil {
+			return err
+		}
+		dataMain.all = append(dataMain.all, addValue)
+		return nil
+	}
+	return fn
+}
+
+var (
+	ErrNoSuchValue = errors.New("no such value")
+	ErrValueExist  = errors.New("Error value exists")
+)
+
+func cutDel(value AllTypes, slice []AllTypes) ([]AllTypes, error) {
+	for i, v := range slice {
+		if value == v {
+			return append(slice[:i], slice[i+1:]...), nil
+		}
+	}
+	return slice, ErrNoSuchValue
+}
+
+func GetDelfunc(delFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error {
+	fn := func(delValue AllTypes) error {
+		dataMain.rwm.Lock()
+		defer dataMain.rwm.Unlock()
+		newSlice, err := cutDel(delValue, dataMain.all)
+		if err != nil {
+			return err // [ErrNoSuchValue]
+		}
+		if _, err := fmt.Fprintln(delFile, delValue); err != nil {
+			return err
+		}
+		dataMain.all = newSlice
+		return nil
+	}
+	return fn
 }
