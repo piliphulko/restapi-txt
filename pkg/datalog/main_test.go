@@ -48,6 +48,7 @@ func Test_TotalTest(t *testing.T) {
 	assert.Nil(t, AddValue(testType{tInt: 10, tString: "abc", tBool: true, tFloat: 25.25}))
 	assert.ErrorContains(t, AddValue(testType{tInt: 10, tString: "abc", tBool: true, tFloat: 25.25}), ErrValueExist.Error())
 	assert.Nil(t, DelValue(testType{tInt: 10, tString: "abc", tBool: true, tFloat: 25.25}))
+	assert.ErrorContains(t, DelValue(testType{tInt: 10, tString: "abc", tBool: true, tFloat: 25.25}), ErrNoSuchValue.Error())
 
 	testFind := testType{tInt: 11, tString: "abc", tBool: false, tFloat: 25.25}
 	assert.Nil(t, AddValue(testFind))

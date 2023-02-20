@@ -3,42 +3,21 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
-	"time"
 
-	dl "github.com/piliphulko/practiceGo/pkg/datalog"
+	_ "github.com/piliphulko/practiceGo/pkg/datalog"
+	"github.com/piliphulko/practiceGo/pkg/privacy"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
 func main() {
-	rand.Seed(time.Now().Unix())
-
-	dl.CheckEndWarehousingData(dl.TypeUser)
-	addFile, delFile, endFn, err := dl.DataWarehouseDeployment(dl.TypeUser)
+	privacy.Keystore.InserKey("0123456789abcdem")
+	text, err := privacy.EncryptString("some text")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer endFn()
-	userData, err := dl.GetMainSlice(dl.TypeUser)
+	fmt.Println(text)
+	text, err = privacy.DecryptString(text)
 	if err != nil {
 		log.Fatal(err)
 	}
-	AddValueUser := dl.GetAddfunc(addFile, userData)
-	DelValueUser := dl.GetDelfunc(delFile, userData)
-
-	if AddValueUser(dl.User{Id: 10, Name: "pip"}) != nil {
-		log.Fatal(err)
-	}
-	if DelValueUser(dl.User{Id: 10, Name: "pip"}) != nil {
-		log.Fatal(err)
-	}
-	if AddValueUser(dl.User{Id: 11, Name: "pip"}) != nil {
-		log.Fatal(err)
-	}
-	f, err := userData.FindValue(dl.User{Id: 11, Name: "pip"})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(f)
+	fmt.Println(text)
 }
