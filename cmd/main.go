@@ -9,7 +9,15 @@ import (
 )
 
 func main() {
-	privacy.Keystore.InserKey("0123456789abcdem")
+	p, err := privacy.CreatePassword("12345678")
+	if err != nil {
+		log.Fatal(err)
+	}
+	CryptoKey, err := privacy.GetHashCryptoKeyFromPassword(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	privacy.Keystore.InserKey(CryptoKey)
 	text, err := privacy.EncryptString("some text")
 	if err != nil {
 		log.Fatal(err)

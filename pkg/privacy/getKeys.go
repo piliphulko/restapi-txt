@@ -15,9 +15,12 @@ var (
 	Keystore keysUsing
 )
 
-func (ku *keysUsing) InserKey(key string) {
-	key = hex.EncodeToString([]byte(key))
-	block, err := aes.NewCipher([]byte(key))
+func (ku *keysUsing) InserKey(keyHex string) {
+	key, err := hex.DecodeString(keyHex)
+	if err != nil {
+		log.Fatal(err)
+	}
+	block, err := aes.NewCipher(key)
 	if err != nil {
 		log.Fatal(err)
 	}
