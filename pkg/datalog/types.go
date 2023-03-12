@@ -16,12 +16,12 @@ type testType struct {
 }
 
 type User struct {
-	Id   int
-	Name string
+	Login    string
+	Passwort string
 }
 
 func (u User) String() string {
-	return fmt.Sprintf(DetailTypes[TypeUser].SampleFMT, u.Id, u.Name)
+	return fmt.Sprintf(DetailTypes[TypeUser].SampleFMT, u.Login, u.Passwort)
 }
 func (tt testType) String() string {
 	return fmt.Sprintf(DetailTypes[typeTest].SampleFMT, tt.tInt, tt.tString, tt.tBool, tt.tFloat)
@@ -67,20 +67,20 @@ var DetailTypes = map[int]typeDetail{
 	},
 	TypeUser: {
 		NameType:              "User",
-		SampleFMT:             "Id: %d Name: %s",
+		SampleFMT:             "Login: %s Passwort: %s",
 		LocationMainFile:      "data/User/mainUser.log",
 		LocationAddFile:       "data/User/addUser.log",
 		LocationDelFile:       "data/User/delUser.log",
 		LocationStockMainFile: "data/User/stockMainUser.log",
 		ScanType: func(s string) (AllTypes, error) {
 			var (
-				id   int
-				name string
+				login    string
+				passwort string
 			)
-			if _, err := fmt.Sscanf(s, "Id: %d Name: %s", &id, &name); err != nil {
+			if _, err := fmt.Sscanf(s, "Login: %s Passwort: %s", &login, &passwort); err != nil {
 				return nil, err
 			}
-			return User{id, name}, nil
+			return User{login, passwort}, nil
 		},
 	},
 }

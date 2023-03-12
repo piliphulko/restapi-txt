@@ -84,7 +84,7 @@ func GetMainSlice(typeData int) (*MutexAllTypes, error) {
 	return &slicePlusMutex, nil
 }
 
-func (mat *MutexAllTypes) findValue(value AllTypes) bool {
+func (mat *MutexAllTypes) FindValue(value AllTypes) bool {
 	for _, v := range mat.all {
 		if value == v {
 			return true
@@ -95,7 +95,7 @@ func (mat *MutexAllTypes) findValue(value AllTypes) bool {
 
 func GetAddfunc(addFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error {
 	fn := func(addValue AllTypes) error {
-		if dataMain.findValue(addValue) {
+		if dataMain.FindValue(addValue) {
 			return ErrValueExist
 		}
 		dataMain.rwm.Lock()
