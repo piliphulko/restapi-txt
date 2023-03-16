@@ -1,4 +1,4 @@
-package datalog
+package datatxt
 
 import (
 	"fmt"

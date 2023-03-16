@@ -1,4 +1,4 @@
-package datalog
+package datatxt
 
 import (
 	"fmt"
@@ -48,10 +48,10 @@ var DetailTypes = map[int]typeDetail{
 	typeTest: {
 		NameType:              "testType",
 		SampleFMT:             "tInt: %d tString: %s tBool: %t tFloat: %g",
-		LocationMainFile:      "datatest/main.log",
-		LocationAddFile:       "datatest/add.log",
-		LocationDelFile:       "datatest/del.log",
-		LocationStockMainFile: "datatest/stockMain.log",
+		LocationMainFile:      "datatest/main.txt",
+		LocationAddFile:       "datatest/add.txt",
+		LocationDelFile:       "datatest/del.txt",
+		LocationStockMainFile: "datatest/stockMain.txt",
 		ScanType: func(s string) (AllTypes, error) {
 			var (
 				tIntV    int
@@ -68,10 +68,10 @@ var DetailTypes = map[int]typeDetail{
 	TypeUser: {
 		NameType:              "User",
 		SampleFMT:             "Login: %s Passwort: %s",
-		LocationMainFile:      "data/User/mainUser.log",
-		LocationAddFile:       "data/User/addUser.log",
-		LocationDelFile:       "data/User/delUser.log",
-		LocationStockMainFile: "data/User/stockMainUser.log",
+		LocationMainFile:      "data/User/mainUser.txt",
+		LocationAddFile:       "data/User/addUser.txt",
+		LocationDelFile:       "data/User/delUser.txt",
+		LocationStockMainFile: "data/User/stockMainUser.txt",
 		ScanType: func(s string) (AllTypes, error) {
 			var (
 				login    string

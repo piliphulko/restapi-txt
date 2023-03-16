@@ -1,4 +1,4 @@
-module github.com/piliphulko/practiceGo
+module github.com/piliphulko/restapi-txt
 
 go 1.19
 

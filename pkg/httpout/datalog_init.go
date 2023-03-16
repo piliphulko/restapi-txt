@@ -3,28 +3,28 @@ package httpout
 import (
 	"log"
 
-	"github.com/piliphulko/practiceGo/pkg/datalog"
+	"github.com/piliphulko/restapi-txt/pkg/datatxt"
 )
 
 var (
-	users   = &datalog.MutexAllTypes{}
-	addUser func(datalog.AllTypes) error
-	delUser func(datalog.AllTypes) error
+	users   = &datatxt.MutexAllTypes{}
+	addUser func(datatxt.AllTypes) error
+	delUser func(datatxt.AllTypes) error
 )
 
 func init() {
-	err := datalog.CheckEndWarehousingData(datalog.TypeUser)
+	err := datatxt.CheckEndWarehousingData(datatxt.TypeUser)
 	if err != nil {
 		log.Fatal(err)
 	}
-	addFileUser, delFileUser, _, err := datalog.DataWarehouseDeployment(datalog.TypeUser)
+	addFileUser, delFileUser, _, err := datatxt.DataWarehouseDeployment(datatxt.TypeUser)
 	if err != nil {
 		log.Fatal(err)
 	}
-	users, err = datalog.GetMainSlice(datalog.TypeUser)
+	users, err = datatxt.GetMainSlice(datatxt.TypeUser)
 	if err != nil {
 		log.Fatal(err)
 	}
-	addUser = datalog.GetAddfunc(addFileUser, users)
-	delUser = datalog.GetDelfunc(delFileUser, users)
+	addUser = datatxt.GetAddfunc(addFileUser, users)
+	delUser = datatxt.GetDelfunc(delFileUser, users)
 }

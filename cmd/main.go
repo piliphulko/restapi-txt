@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 
-	_ "github.com/piliphulko/practiceGo/pkg/datalog"
-	"github.com/piliphulko/practiceGo/pkg/httpout"
-	_ "github.com/piliphulko/practiceGo/pkg/privacy"
+	_ "github.com/piliphulko/restapi-txt/pkg/datatxt"
+	"github.com/piliphulko/restapi-txt/pkg/httpout"
+	_ "github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 func main() {

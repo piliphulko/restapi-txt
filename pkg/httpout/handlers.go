@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/piliphulko/practiceGo/pkg/datalog"
+	"github.com/piliphulko/restapi-txt/pkg/datatxt"
 )
 
 func ErrorNoJWT(w http.ResponseWriter, r *http.Request) {
@@ -45,11 +45,11 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		sendErrJson(err, w, http.StatusBadRequest)
 		return
 	}
-	if users.FindValue(datalog.User{Login: v.Login, Passwort: v.Passwort}) {
+	if users.FindValue(datatxt.User{Login: v.Login, Passwort: v.Passwort}) {
 		sendErrJson(errors.New("such user exists"), w, http.StatusBadRequest)
 		return
 	}
-	if err := addUser(datalog.User{Login: v.Login, Passwort: v.Passwort}); err != nil {
+	if err := addUser(datatxt.User{Login: v.Login, Passwort: v.Passwort}); err != nil {
 		sendErrJson(err, w, http.StatusBadRequest)
 		return
 	}
