@@ -80,4 +80,10 @@ func Benchmark_all(b *testing.B) {
 	bendE = &err
 }
 
-//Benchmark_all-8   	       1	2887601500 ns/op	1648825496 B/op	  329879 allocs/op
+//Benchmark_all-8   	       1	2794215200 ns/op	1648823224 B/op	  329862 allocs/op
+// cipher in read
+//Benchmark_all-8   	       1	2983876800 ns/op	1648828000 B/op	  329927 allocs/op // new 7%
+// cipher in write
+//Benchmark_all-8   	       1	2852895400 ns/op	1648824872 B/op	  329877 allocs/op // new 2%
+// cipher in read + write
+//Benchmark_all-8   	       1	2870447200 ns/op	1648821768 B/op	  329859 allocs/op // new 3%???

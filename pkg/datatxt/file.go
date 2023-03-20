@@ -2,6 +2,7 @@ package datatxt
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -26,7 +27,7 @@ func logFataIF(err error, typeData int) {
 //
 // If there is no file, then it is created. after reading the data, the file is closed inside the function
 
-func newGetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
+func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
 	if err != nil {
 		return nil, errInfoType(err, typeData)
@@ -34,7 +35,7 @@ func newGetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) 
 	var (
 		scanner  = bufio.NewScanner(file)
 		slice    = make([]AllTypes, 0)
-		readText = func(text string) (string, error) {
+		readText = func(text string) (string, error) { // -7% fast
 			return text, nil
 		}
 	)
@@ -63,7 +64,7 @@ func newGetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) 
 	return slice, nil
 }
 
-func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
+func oldGetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
 	if err != nil {
 		return nil, errInfoType(err, typeData)
@@ -118,7 +119,7 @@ func DataWarehouseDeployment(typeData int) (*os.File, *os.File, func(), error) {
 
 // warehousingData a function that collects data from files removed and added to the main storage
 
-func warehousingData(typeData int) {
+func oldwarehousingData(typeData int) {
 	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
 	logFataIF(err, typeData)
 	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
@@ -130,6 +131,27 @@ func warehousingData(typeData int) {
 	logFataIF(err, typeData)
 	for _, v := range cleanAddDel(typesMain, typesAdd, typesDel) {
 		fmt.Fprintln(fMain, v)
+	}
+	logFataIF(fMain.Close(), typeData)
+	os.Remove(DetailTypes[typeData].LocationAddFile)
+	os.Remove(DetailTypes[typeData].LocationDelFile)
+	os.Remove(DetailTypes[typeData].LocationStockMainFile)
+}
+
+func warehousingData(typeData int) {
+	typesMain, err := GetDataTypesFromFile(DetailTypes[typeData].LocationMainFile, typeData)
+	logFataIF(err, typeData)
+	typesAdd, err := GetDataTypesFromFile(DetailTypes[typeData].LocationAddFile, typeData)
+	logFataIF(err, typeData)
+	typesDel, err := GetDataTypesFromFile(DetailTypes[typeData].LocationDelFile, typeData)
+	logFataIF(err, typeData)
+	logFataIF(os.Rename(DetailTypes[typeData].LocationMainFile, DetailTypes[typeData].LocationStockMainFile), typeData)
+	fMain, err := os.OpenFile(DetailTypes[typeData].LocationMainFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0755))
+	logFataIF(err, typeData)
+	buf := bytes.Buffer{}
+	for _, v := range cleanAddDel(typesMain, typesAdd, typesDel) {
+		fmt.Fprintln(&buf, v)
+		logFataIF(WriteFromBuffer(fMain, buf, typeData), typeData)
 	}
 	logFataIF(fMain.Close(), typeData)
 	os.Remove(DetailTypes[typeData].LocationAddFile)

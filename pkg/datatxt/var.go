@@ -39,7 +39,7 @@ var DetailTypes = map[int]typeDetail{
 			}
 			return testType{tIntV, tStringV, tBoolV, tFloatV}, nil
 		},
-		Cipher: privacy.CipherUse{Cipher: true},
+		Cipher: privacy.CipherUse{Cipher: false},
 	},
 	TypeUser: {
 		NameType:              "User",

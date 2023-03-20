@@ -1,8 +1,12 @@
 package datatxt
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
+
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 func UniqueOld(slice []AllTypes) []AllTypes {
@@ -72,6 +76,23 @@ func cleanAddDel(typesMain, typesAdd, typesDel []AllTypes) []AllTypes {
 		}
 	}
 	return returnTypes
+}
+
+func WriteFromBuffer(w io.Writer, buf bytes.Buffer, typeData int) error {
+	if DetailTypes[typeData].Cipher.Cipher {
+		text, err := privacy.EncryptString(buf.String())
+		if err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, text); err != nil {
+			return err
+		}
+	} else {
+		if _, err := fmt.Fprintln(w, buf.String()); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func GetMainSlice(typeData int) (*MutexAllTypes, error) {
