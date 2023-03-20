@@ -129,8 +129,9 @@ func CheckEndWarehousingData(typeData int) error {
 	_, err2 := os.Stat(DetailTypes[typeData].LocationDelFile)
 	switch {
 	case (errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
-		fmt.Printf("did not happen: %s\n", DetailTypes[typeData].NameType)
+		fmt.Printf("type sorting to file did not happen, attempt to fix: %s\n", DetailTypes[typeData].NameType)
 		warehousingData(typeData)
+		fmt.Printf("type sorting to file successfully completed: %s\n", DetailTypes[typeData].NameType)
 	case !(errors.Is(err0, os.ErrNotExist)) && !(errors.Is(err1, os.ErrNotExist)) && !(errors.Is(err2, os.ErrNotExist)):
 		fmt.Printf("there was an incorrect completion of writing to the main file: %s\n", DetailTypes[typeData].NameType)
 		if err := os.Remove(DetailTypes[typeData].LocationMainFile); err != nil {

@@ -1,7 +1,6 @@
 package datatxt
 
 import (
-	"errors"
 	"fmt"
 	"os"
 )
@@ -108,11 +107,6 @@ func GetAddfunc(addFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error 
 	}
 	return fn
 }
-
-var (
-	ErrNoSuchValue = errors.New("no such value")
-	ErrValueExist  = errors.New("Error value exists")
-)
 
 func cutDel(value AllTypes, slice []AllTypes) ([]AllTypes, error) {
 	for i, v := range slice {

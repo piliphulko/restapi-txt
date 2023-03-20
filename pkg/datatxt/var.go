@@ -1,31 +1,14 @@
 package datatxt
 
 import (
+	"errors"
 	"fmt"
-	"sync"
 )
 
-type AllTypes interface {
-	String() string
-}
-type testType struct {
-	tInt    int
-	tString string
-	tBool   bool
-	tFloat  float64
-}
-
-type User struct {
-	Login    string
-	Passwort string
-}
-
-func (u User) String() string {
-	return fmt.Sprintf(DetailTypes[TypeUser].SampleFMT, u.Login, u.Passwort)
-}
-func (tt testType) String() string {
-	return fmt.Sprintf(DetailTypes[typeTest].SampleFMT, tt.tInt, tt.tString, tt.tBool, tt.tFloat)
-}
+var (
+	ErrNoSuchValue = errors.New("no such value")
+	ErrValueExist  = errors.New("Error value exists")
+)
 
 const (
 	typeTest = iota
@@ -83,9 +66,4 @@ var DetailTypes = map[int]typeDetail{
 			return User{login, passwort}, nil
 		},
 	},
-}
-
-type MutexAllTypes struct {
-	rwm sync.RWMutex
-	all []AllTypes
 }
