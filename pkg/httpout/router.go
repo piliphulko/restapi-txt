@@ -1,6 +1,8 @@
 package httpout
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -21,11 +23,19 @@ func StartRouter() http.Handler {
 	r.Post("/create/account", CreateAccount)
 	r.Post("/create/jwt", CreateJWT)
 
+	r.Post("/ok", func(w http.ResponseWriter, r *http.Request) {
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(r.Body)
+		fmt.Println((buf.String()))
+	})
+
+	r.Delete("/delete/account", DeleteAccount)
+
 	r.Get("/error/jwt", ErrorNoJWT)
 
-	r.Route("/{Login}", func(r chi.Router) {
-		r.Use(TakeJWT)
-		r.Get("/", GetDate)
+	r.Route("/abc", func(r chi.Router) {
+		r.Use(TakeJWTandLogin)
+		r.Get("/date", GetDate)
 	})
 	return r
 }
