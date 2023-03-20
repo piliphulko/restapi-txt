@@ -3,6 +3,8 @@ package datatxt
 import (
 	"errors"
 	"fmt"
+
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 var (
@@ -14,16 +16,6 @@ const (
 	typeTest = iota
 	TypeUser
 )
-
-type typeDetail struct {
-	NameType              string
-	SampleFMT             string // writer template
-	LocationMainFile      string
-	LocationAddFile       string
-	LocationDelFile       string
-	LocationStockMainFile string
-	ScanType              func(string) (AllTypes, error) // reader template
-}
 
 // DetailTypes map where spelled out the main details of the implementation of types in the package
 
@@ -47,6 +39,7 @@ var DetailTypes = map[int]typeDetail{
 			}
 			return testType{tIntV, tStringV, tBoolV, tFloatV}, nil
 		},
+		Cipher: privacy.CipherUse{Cipher: true},
 	},
 	TypeUser: {
 		NameType:              "User",

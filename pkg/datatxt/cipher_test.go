@@ -1,34 +1,18 @@
-package datatxt
+package datatxt_test
 
 import (
 	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 
+	"github.com/piliphulko/restapi-txt/pkg/datatxt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func changeToTestPath(m map[int]typeDetail, typeData int, newDir string) {
-	change := func(oldLocation, newDir string) string {
-		s := strings.Split(filepath.Dir(oldLocation), `\`)
-		s[0] = newDir
-		return strings.Join(s, "/") + "/" + filepath.Base(oldLocation)
-	}
-	getStruct := m[typeData]
-	delete(m, typeData)
-	getStruct.LocationMainFile = change(getStruct.LocationMainFile, newDir)
-	getStruct.LocationAddFile = change(getStruct.LocationAddFile, newDir)
-	getStruct.LocationDelFile = change(getStruct.LocationDelFile, newDir)
-	getStruct.LocationStockMainFile = change(getStruct.LocationStockMainFile, newDir)
-	m[typeData] = getStruct
-}
-
 var locationTest = "datatest"
 
 var (
-	AddValue         func(AllTypes) error
+	AddValue         func(datatxt.AllTypes) error
 	DelValue         func(AllTypes) error
 	addFile, delFile *os.File
 )
@@ -79,5 +63,3 @@ func Benchmark_all(b *testing.B) {
 	err := CheckEndWarehousingData(typeTest)
 	bendE = &err
 }
-
-//Benchmark_all-8   	       1	2887601500 ns/op	1648825496 B/op	  329879 allocs/op

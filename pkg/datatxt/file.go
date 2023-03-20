@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 func errInfoType(err error, typeData int) error {
@@ -23,6 +25,43 @@ func logFataIF(err error, typeData int) {
 // returns a slice of the read data and an error
 //
 // If there is no file, then it is created. after reading the data, the file is closed inside the function
+
+func newGetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))
+	if err != nil {
+		return nil, errInfoType(err, typeData)
+	}
+	var (
+		scanner  = bufio.NewScanner(file)
+		slice    = make([]AllTypes, 0)
+		readText = func(text string) (string, error) {
+			return text, nil
+		}
+	)
+	if DetailTypes[typeData].Cipher.Cipher {
+		readText = func(text string) (string, error) {
+			return privacy.DecryptString(scanner.Text())
+		}
+	}
+	for scanner.Scan() {
+		text, err := readText(scanner.Text())
+		if err != nil {
+			return nil, errInfoType(err, typeData)
+		}
+		sliceType, err := DetailTypes[typeData].ScanType(text)
+		if err != nil {
+			return nil, errInfoType(err, typeData)
+		}
+		slice = append(slice, sliceType)
+	}
+	if scanner.Err() != nil {
+		return nil, errInfoType(err, typeData)
+	}
+	if file.Close() != nil {
+		return nil, errInfoType(err, typeData)
+	}
+	return slice, nil
+}
 
 func GetDataTypesFromFile(fileName string, typeData int) ([]AllTypes, error) {
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDONLY, os.FileMode(0755))

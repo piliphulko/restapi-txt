@@ -3,11 +3,25 @@ package datatxt
 import (
 	"fmt"
 	"sync"
+
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 type AllTypes interface {
 	String() string
 }
+
+type typeDetail struct {
+	NameType              string
+	SampleFMT             string // writer template
+	LocationMainFile      string
+	LocationAddFile       string
+	LocationDelFile       string
+	LocationStockMainFile string
+	ScanType              func(string) (AllTypes, error) // reader template
+	Cipher                privacy.CipherUse
+}
+
 type testType struct {
 	tInt    int
 	tString string
