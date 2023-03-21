@@ -30,6 +30,8 @@ var (
 	ErrPasswortLong8 = errors.New("password must be 8 characters long and more")
 )
 
+// CreatePassword gets a password of at least 8 characters, returns its hash
+
 func CreatePassword(password string) (string, error) {
 	if len(password) < 8 {
 		return "", ErrPasswortLong8
@@ -43,6 +45,7 @@ func CreatePassword(password string) (string, error) {
 	passwordHex := hex.EncodeToString([]byte(password))
 	encodedRepresentation := fmt.Sprintf("argon2id salt=%s password=%s time=%d memory=%d threads=%d keyLen=%d",
 		saltHex, passwordHex, defaultArgon2.time, defaultArgon2.memory, defaultArgon2.threads, defaultArgon2.keyLen)
+
 	return hex.EncodeToString([]byte(encodedRepresentation)), nil
 }
 

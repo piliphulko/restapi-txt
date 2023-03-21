@@ -11,16 +11,24 @@ type keysUsing struct {
 	block cipher.Block
 }
 
-var (
-	Keystore keysUsing
-)
+// Keystore The variable into which you need to insert the key
+// through the method InserKey
+
+var Keystore keysUsing
+
+// InserKey inserting a key into a variable Keystore
+// the password must be generated using the function CreatePassword
 
 func (ku *keysUsing) InserKey(keyHex string) {
-	key, err := hex.DecodeString(keyHex)
+	key, err := GetHashCryptoKeyFromPassword(keyHex)
 	if err != nil {
 		log.Fatal(err)
 	}
-	block, err := aes.NewCipher(key)
+	keyHash, err := hex.DecodeString(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	block, err := aes.NewCipher(keyHash)
 	if err != nil {
 		log.Fatal(err)
 	}

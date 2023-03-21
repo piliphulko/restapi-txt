@@ -29,10 +29,7 @@ func TestTotal(t *testing.T) {
 	p, err := CreatePassword("12345678")
 	require.Nil(t, err)
 
-	CryptoKey, err := GetHashCryptoKeyFromPassword(p)
-	require.Nil(t, err)
-
-	Keystore.InserKey(CryptoKey)
+	Keystore.InserKey(p)
 	text, err := EncryptString("some text")
 	require.Nil(t, err)
 
