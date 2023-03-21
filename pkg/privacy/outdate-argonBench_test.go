@@ -11,8 +11,8 @@ var compilerGoof interface{}
 func BenchmarkArgonParams(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
-		pas, _ := CreatePassword(newWord(8))
-		cryptoKey, _ := GetHashCryptoKeyFromPassword(pas)
+		pas, _ := createPassword(newWord(8))
+		cryptoKey, _ := getHashCryptoKeyFromPassword(pas)
 		compilerGoof = cryptoKey
 	}
 }

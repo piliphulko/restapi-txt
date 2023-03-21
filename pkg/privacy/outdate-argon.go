@@ -32,7 +32,7 @@ var (
 
 // CreatePassword gets a password of at least 8 characters, returns its hash
 
-func CreatePassword(password string) (string, error) {
+func createPassword(password string) (string, error) {
 	if len(password) < 8 {
 		return "", ErrPasswortLong8
 	}
@@ -49,7 +49,7 @@ func CreatePassword(password string) (string, error) {
 	return hex.EncodeToString([]byte(encodedRepresentation)), nil
 }
 
-func GetHashCryptoKeyFromPassword(passwordHex string) (string, error) {
+func getHashCryptoKeyFromPassword(passwordHex string) (string, error) {
 	password, err := hex.DecodeString(passwordHex)
 	if err != nil {
 		return "", err

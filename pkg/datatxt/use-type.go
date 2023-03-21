@@ -129,6 +129,27 @@ func GetAddfunc(addFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error 
 	return fn
 }
 
+func NewGetAddfunc(addFile *os.File, dataMain *MutexAllTypes, typeData int) func(AllTypes) error {
+	buf := bytes.Buffer{}
+	fn := func(addValue AllTypes) error {
+		if dataMain.FindValue(addValue) {
+			return ErrValueExist
+		}
+		dataMain.rwm.Lock()
+		defer dataMain.rwm.Unlock()
+		if _, err := fmt.Fprint(&buf, addValue); err != nil {
+			return err
+		}
+		if err := WriteFromBuffer(addFile, buf, typeData); err != nil {
+			return err
+		}
+		dataMain.all = append(dataMain.all, addValue)
+		buf.Reset()
+		return nil
+	}
+	return fn
+}
+
 func cutDel(value AllTypes, slice []AllTypes) ([]AllTypes, error) {
 	for i, v := range slice {
 		if value == v {
@@ -153,4 +174,33 @@ func GetDelfunc(delFile *os.File, dataMain *MutexAllTypes) func(AllTypes) error 
 		return nil
 	}
 	return fn
+}
+
+func NewGetDelfunc(delFile *os.File, dataMain *MutexAllTypes, typeData int) func(AllTypes) error {
+	buf := bytes.Buffer{}
+	fn := func(delValue AllTypes) error {
+		dataMain.rwm.Lock()
+		defer dataMain.rwm.Unlock()
+		newSlice, err := cutDel(delValue, dataMain.all)
+		if err != nil {
+			return err // [ErrNoSuchValue]
+		}
+		if _, err := fmt.Fprint(&buf, delValue); err != nil {
+			return err
+		}
+		if err := WriteFromBuffer(delFile, buf, typeData); err != nil {
+			return err
+		}
+		dataMain.all = newSlice
+		buf.Reset()
+		return nil
+	}
+	return fn
+}
+
+func UseCipherInType(typeData int) {
+	getStruct := DetailTypes[typeData]
+	delete(DetailTypes, typeData)
+	getStruct.Cipher = privacy.CipherUse{Cipher: true}
+	DetailTypes[typeData] = getStruct
 }

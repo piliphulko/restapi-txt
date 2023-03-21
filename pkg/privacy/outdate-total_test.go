@@ -24,12 +24,12 @@ func TestTotal(t *testing.T) {
 	_, err = DecryptString("")
 	require.ErrorContains(t, err, ErrNoKey.Error())
 
-	_, err = CreatePassword("1234567")
+	_, err = createPassword("1234567")
 	require.ErrorContains(t, err, ErrPasswortLong8.Error())
-	p, err := CreatePassword("12345678")
+	p, err := createPassword("12345678")
 	require.Nil(t, err)
 
-	Keystore.InserKey(p)
+	Keystore.inserKey(p)
 	text, err := EncryptString("some text")
 	require.Nil(t, err)
 
@@ -42,9 +42,9 @@ func TestCreateGet(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i != 100; i++ {
 		t.Run("", func(t *testing.T) {
-			a, err := CreatePassword(newWord(rand.Intn(5) + 8))
+			a, err := createPassword(newWord(rand.Intn(5) + 8))
 			require.Nil(t, err)
-			_, err = GetHashCryptoKeyFromPassword(a)
+			_, err = getHashCryptoKeyFromPassword(a)
 			require.Nil(t, err)
 		})
 	}

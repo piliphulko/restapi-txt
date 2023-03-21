@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/piliphulko/restapi-txt/pkg/datatxt"
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 )
 
 var (
@@ -13,6 +14,10 @@ var (
 )
 
 func init() {
+	var key = "abc12345rdtwer67"
+	privacy.Keystore.InserKey(key)
+
+	datatxt.UseCipherInType(datatxt.TypeUser)
 	err := datatxt.CheckEndWarehousingData(datatxt.TypeUser)
 	if err != nil {
 		log.Fatal(err)
@@ -25,6 +30,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	addUser = datatxt.GetAddfunc(addFileUser, users)
-	delUser = datatxt.GetDelfunc(delFileUser, users)
+	addUser = datatxt.NewGetAddfunc(addFileUser, users, datatxt.TypeUser)
+	delUser = datatxt.NewGetDelfunc(delFileUser, users, datatxt.TypeUser)
 }

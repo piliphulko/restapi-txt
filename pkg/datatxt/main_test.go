@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/piliphulko/restapi-txt/pkg/privacy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -36,7 +37,9 @@ var (
 func TestMain(m *testing.M) {
 	os.RemoveAll(locationTest)
 	changeToTestPath(DetailTypes, typeTest, "datatest/TotalTest")
+	UseCipherInType(typeTest)
 	CheckEndWarehousingData(typeTest)
+	privacy.Keystore.InserKey("key12345")
 	addFile, delFile, _, err := DataWarehouseDeployment(typeTest)
 	if err != nil {
 		panic(err)
@@ -45,8 +48,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	AddValue = GetAddfunc(addFile, testData)
-	DelValue = GetDelfunc(delFile, testData)
+	AddValue = NewGetAddfunc(addFile, testData, typeTest)
+	DelValue = NewGetDelfunc(delFile, testData, typeTest)
 
 	mR := m.Run()
 	addFile.Close()
@@ -87,3 +90,5 @@ func Benchmark_all(b *testing.B) {
 //Benchmark_all-8   	       1	2852895400 ns/op	1648824872 B/op	  329877 allocs/op // new 2%
 // cipher in read + write
 //Benchmark_all-8   	       1	2870447200 ns/op	1648821768 B/op	  329859 allocs/op // new 3%???
+//implementation cipher:
+//Benchmark_all-8   	       1	3008773400 ns/op	1671801944 B/op	  690103 allocs/op --

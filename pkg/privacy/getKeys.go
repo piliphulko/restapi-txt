@@ -17,10 +17,18 @@ type keysUsing struct {
 var Keystore keysUsing
 
 // InserKey inserting a key into a variable Keystore
-// the password must be generated using the function CreatePassword
+// the password
 
-func (ku *keysUsing) InserKey(keyHex string) {
-	key, err := GetHashCryptoKeyFromPassword(keyHex)
+func (ku *keysUsing) InserKey(key string) {
+	block, err := aes.NewCipher([]byte(hex.EncodeToString([]byte(key))))
+	if err != nil {
+		log.Fatal(err)
+	}
+	ku.block = block
+}
+
+func (ku *keysUsing) inserKey(keyHex string) {
+	key, err := getHashCryptoKeyFromPassword(keyHex)
 	if err != nil {
 		log.Fatal(err)
 	}
