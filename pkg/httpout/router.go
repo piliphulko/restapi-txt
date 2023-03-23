@@ -10,6 +10,10 @@ import (
 )
 
 func StartRouter() http.Handler {
+	InitializeLogger()
+
+	Logger.Info("start")
+
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
