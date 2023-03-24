@@ -17,11 +17,11 @@ func CreateJWT(w http.ResponseWriter, r *http.Request) {
 	var v user
 	err := json.NewDecoder(r.Body).Decode(&v)
 	if err != nil {
-		sendErrJson(ErrLoginPasswort, w, http.StatusUnauthorized)
+		sendErrJsonAndLog(ErrLoginPasswort, w, http.StatusUnauthorized)
 		return
 	}
 	if !users.FindValue(datatxt.User{Login: v.Login, Passwort: v.Passwort}) {
-		sendErrJson(ErrLoginPasswort, w, http.StatusBadRequest)
+		sendErrJsonAndLog(ErrLoginPasswort, w, http.StatusBadRequest)
 		return
 	}
 	_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{
@@ -41,11 +41,11 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Content-Type", "application/json; charset=utf-8")
 	var v user
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
-		sendErrJson(err, w, http.StatusBadRequest)
+		sendErrJsonAndLog(err, w, http.StatusBadRequest)
 		return
 	}
 	if err := addUser(datatxt.User{Login: v.Login, Passwort: v.Passwort}); err != nil {
-		sendErrJson(err, w, http.StatusBadRequest) // possible error: datatxt.ErrValueExist
+		sendErrJsonAndLog(err, w, http.StatusBadRequest) // possible error: datatxt.ErrValueExist
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -54,11 +54,11 @@ func DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Content-Type", "application/json; charset=utf-8")
 	var v user
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
-		sendErrJson(err, w, http.StatusBadRequest)
+		sendErrJsonAndLog(err, w, http.StatusBadRequest)
 		return
 	}
 	if err := delUser(datatxt.User{Login: v.Login, Passwort: v.Passwort}); err != nil {
-		sendErrJson(err, w, http.StatusBadRequest) // possible error: datatxt.ErrNoSuchValue
+		sendErrJsonAndLog(err, w, http.StatusBadRequest) // possible error: datatxt.ErrNoSuchValue
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
