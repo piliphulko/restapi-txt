@@ -12,7 +12,7 @@ import (
 
 func init() {
 	viper.SetConfigType("json")
-	viper.SetConfigFile("../config/config.json")
+	viper.SetConfigFile("../../config/config.json")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal(err)
 	}
