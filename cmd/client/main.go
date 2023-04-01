@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -27,7 +28,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(jwt)
+	date, err := client.GetData(ctx, jwt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(date)
 }
 
 func (client httpClient) CreateAccount(ctx context.Context, m map[string]interface{}) error {
@@ -63,7 +68,7 @@ func (client httpClient) TakeJWT(ctx context.Context, m map[string]interface{}) 
 	}
 	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/create/jwt", bytes.NewReader(b))
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	request, err := client.Do(req)
@@ -80,4 +85,20 @@ func (client httpClient) TakeJWT(ctx context.Context, m map[string]interface{}) 
 	return jwt.JWT, nil
 }
 
-func GetData() {}
+func (client httpClient) GetData(ctx context.Context, jwt string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/abc/date", nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("Authorization", "BEARER "+jwt)
+	request, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer request.Body.Close()
+	b, err := io.ReadAll(request.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
